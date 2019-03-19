@@ -38,7 +38,7 @@ router.post('/login', function(req, res, next) {
       Codificación del Token
       user: Datos de usuario: username, grupos, fecha expiración
      */
-    jwt.sign({user: user}, secretkey, (err, token) => {
+    jwt.sign({user: user}, secretkey, {expiresIn:'30m' } (err, token) => {
       //console.log(err);
       // Comprobamos si nno hay error
       if (err == null) {
