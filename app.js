@@ -4,7 +4,13 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+// Inclusión de JWT
 var jwt = require('jsonwebtoken');
+
+// Inclusión de Swagger Tools
+var swaggerUi = require('swagger-ui-express'),
+    swaggerDocument = require('./openapi/api-doc.json');
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -22,9 +28,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Inclusión de Rutas
 app.use('/', indexRouter);
-app.use('/api/users', usersRouter);
 app.use('/api', apiRouter);
+app.use('/api/users', usersRouter);
+
+// Ruta de Swagger UI
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

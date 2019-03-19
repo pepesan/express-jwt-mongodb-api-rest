@@ -65,7 +65,7 @@ router.post('/login', function(req, res, next) {
 
 function verifyToken(req,res,next){
   const bearerHeader= req.headers['authorization'];
-  console.log(bearerHeader);
+  //console.log(bearerHeader);
   // Comprobamos que está presente el token
   if(typeof bearerHeader !== "undefined"){
     // Presente
