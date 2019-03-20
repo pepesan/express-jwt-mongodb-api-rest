@@ -28,44 +28,61 @@ router.post('/login', function(req, res, next) {
     password: "admin"
   };
   */
-  var user=req.body;
+  var userReq=req.body;
   //TODO: validar entrada user
   // SecretKey
   const secretkey= 'secretkey';
-  // Verificación de login
-  if (user.username=='admin' && user.password=='admin') {
-    /*
-      Codificación del Token
-      user: Datos de usuario: username, grupos, fecha expiración
-     */
-    jwt.sign({user: user}, secretkey, {expiresIn:'30m' }, (err, token) => {
-      //console.log(err);
-      // Comprobamos si nno hay error
-      if (err == null) {
-        //devolvemos el token
-        res.json({token});
+  UserDAO.findOne({username: userReq.username}, function (err, user)
+  {
+    //console.log(err);
+    if(err!=null){
+      res.json({
+        message: "Usuario Incorrecto",
+        user: userReq
+      });
+    }else{
+      // Verificación de login
+      //console.log(user);
+      if (user!=null && user.password !=null && user.password==userReq.password) {
+        /*
+          Codificación del Token
+          user: Datos de usuario: username, grupos, fecha expiración
+         */
+        jwt.sign({user: user}, secretkey, {expiresIn:'30m' }, (err, token) => {
+          //console.log(user);
+          // Comprobamos si nno hay error
+          if (err == null) {
+            //devolvemos el token
+            res.json({
+              message: "Login Correct",
+              token:token
+            });
+          }else{
+            // Devolvemos el error
+            res.json({
+              message: "Login incorrect",
+              user: user
+            });
+          }
+        });
       }else{
-        // Devolvemos el error
+        //devolvemos el error de login
         res.json({
           message: "Login incorrect",
           user: user
         });
       }
-    });
-  }else{
-    //devolvemos el error de login
-    res.json({
-      message: "Login incorrect",
-      user: user
-    });
-  }
+    }
+
+  });
+
 
 });
 
 
 function verifyToken(req,res,next){
   const bearerHeader= req.headers['authorization'];
-  //console.log(bearerHeader);
+  //  console.log(bearerHeader);
   // Comprobamos que está presente el token
   if(typeof bearerHeader !== "undefined"){
     // Presente

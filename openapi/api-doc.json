@@ -38,11 +38,10 @@
         }
     ],
     "schemes": [
-        "https",
         "http"
     ],
     "paths": {
-        "/user/login": {
+        "/login": {
             "get": {
                 "tags": [
                     "login/register/token"
@@ -95,7 +94,7 @@
                 }
             }
         },
-        "/user/logout": {
+        "/logout": {
             "get": {
                 "tags": [
                     "login/register/token"
@@ -126,15 +125,6 @@
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "The name that needs to be fetched. Use user1 for testing. ",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "successful operation",
@@ -161,15 +151,6 @@
                 "operationId": "getUsers",
                 "produces": [
                     "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "The name that needs to be fetched. Use user1 for testing. ",
-                        "required": true,
-                        "type": "string"
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -363,9 +344,6 @@
         "Group": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 }

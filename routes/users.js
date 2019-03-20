@@ -16,13 +16,14 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next)
 {
-  console.log(req.body);
+  //console.log(req.body);
   new UserDAO({
     username: req.body.username,
     password: req.body.password,
     active: true
   }).save(function(err, user, count)
   {
+    //console.log(user);
     res.json({res:"Success",user:user});
   });
 });
