@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "mocha"
+    "dev": "nodemon ./bin/www",
+    "test": "mocha --reporter mochawesome"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
@@ -21,8 +22,9 @@
     "swagger-ui-express": "^4.0.2"
   },
   "devDependencies": {
-    "mocha": "^6.0.2",
     "chai": "^4.2.0",
-    "chai-http": "^4.2.1"
+    "chai-http": "^4.2.1",
+    "mocha": "^6.0.2",
+    "mochawesome": "^3.1.1"
   }
 }

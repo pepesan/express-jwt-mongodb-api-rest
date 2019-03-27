@@ -42,74 +42,42 @@
     ],
     "paths": {
         "/login": {
-            "get": {
+            "post": {
                 "tags": [
                     "login/register/token"
                 ],
-                "summary": "Logs user into the system",
+                "summary": "Loguea un usuario",
                 "description": "",
                 "operationId": "loginUser",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
-                    "application/xml",
                     "application/json"
                 ],
                 "parameters": [
                     {
-                        "name": "username",
-                        "in": "query",
-                        "description": "The user name for login",
+                        "in": "body",
+                        "name": "body",
+                        "description": "Objeto de Usuario",
                         "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "password",
-                        "in": "query",
-                        "description": "The password for login in clear text",
-                        "required": true,
-                        "type": "string"
+                        "schema": {
+                            "$ref": "#/definitions/LoginForm"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "type": "string"
-                        },
-                        "headers": {
-                            "X-Rate-Limit": {
-                                "type": "integer",
-                                "format": "int32",
-                                "description": "calls per hour allowed by the user"
-                            },
-                            "X-Expires-After": {
-                                "type": "string",
-                                "format": "date-time",
-                                "description": "date in UTC when token expires"
-                            }
+                            "$ref": "#/definitions/LoginResponse"
                         }
                     },
-                    "400": {
-                        "description": "Invalid username/password supplied"
-                    }
-                }
-            }
-        },
-        "/logout": {
-            "get": {
-                "tags": [
-                    "login/register/token"
-                ],
-                "summary": "Logs out current logged in user session",
-                "description": "",
-                "operationId": "logoutUser",
-                "produces": [
-                    "application/xml",
-                    "application/json"
-                ],
-                "parameters": [],
-                "responses": {
-                    "default": {
-                        "description": "successful operation"
+                    "405": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/LoginResponse"
+                        }
                     }
                 }
             }
@@ -129,7 +97,7 @@
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "$ref": "#/definitions/User"
+                            "$ref": "#/definitions/TokenResponse"
                         }
                     },
                     "400": {
@@ -138,7 +106,12 @@
                     "404": {
                         "description": "User not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
             }
         },
         "/users": {
@@ -156,7 +129,7 @@
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "$ref": "#/definitions/User"
+                            "$ref": "#/definitions/GetUsersResponse"
                         }
                     },
                     "400": {
@@ -211,11 +184,10 @@
                 "tags": [
                     "users"
                 ],
-                "summary": "Get user by user name",
+                "summary": "Get user by id",
                 "description": "",
                 "operationId": "getUserByName",
                 "produces": [
-                    "application/xml",
                     "application/json"
                 ],
                 "parameters": [
@@ -231,7 +203,7 @@
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "$ref": "#/definitions/User"
+                            "$ref": "#/definitions/GetUserResponse"
                         }
                     },
                     "400": {
@@ -266,7 +238,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "Pet object that needs to be added to the store",
+                        "description": "Objeto de User para modificar el usuario con ID",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/User"
@@ -275,7 +247,10 @@
                 ],
                 "responses": {
                     "400": {
-                        "description": "Invalid ID supplied"
+                        "description": "Invalid ID supplied",
+                        "schema": {
+                            "$ref": "#/definitions/GetUserResponse"
+                        }
                     },
                     "404": {
                         "description": "Pet not found"
@@ -314,17 +289,28 @@
                     }
                 ],
                 "responses": {
+                    "200": {
+                        "description": "Usuario Borrado",
+                        "schema": {
+                            "$ref": "#/definitions/GetUserResponse"
+                        }
+                    },
                     "400": {
-                        "description": "Invalid username supplied"
+                        "description": "ID incorrecto"
                     },
                     "404": {
-                        "description": "User not found"
+                        "description": "Usuario no encontrado"
                     }
                 }
             }
         }
     },
     "securityDefinitions": {
+        "Bearer": {
+            "type": "apikey",
+            "name": "Authorization",
+            "in": "header"
+        },
         "petstore_auth": {
             "type": "oauth2",
             "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
@@ -341,6 +327,12 @@
         }
     },
     "definitions": {
+        "Groups": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Group"
+            }
+        },
         "Group": {
             "type": "object",
             "properties": {
@@ -349,70 +341,90 @@
                 }
             }
         },
-        "User": {
+        "LoginForm": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "format": "int64"
-                },
                 "username": {
                     "type": "string"
                 },
-                "firstName": {
+                "password": {
                     "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
+                }
+            },
+            "xml": {
+                "name": "LoginForm"
+            }
+        },
+        "Users": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/User"
+            }
+        },
+        "User": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "email": {
                     "type": "string"
                 },
                 "groups": {
-                    "$ref": "#/definitions/Group"
+                    "$ref": "#/definitions/Groups"
                 },
                 "password": {
                     "type": "string"
                 },
-                "phone": {
-                    "type": "string"
-                },
-                "userStatus": {
-                    "type": "integer",
-                    "format": "int32",
-                    "description": "User Status"
+                "active": {
+                    "type": "boolean"
                 }
             },
             "xml": {
                 "name": "User"
             }
         },
-        "Tag": {
+        "TokenResponse": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "format": "int64"
+                "message": {
+                    "type": "string"
                 },
-                "name": {
+                "token": {
                     "type": "string"
                 }
-            },
-            "xml": {
-                "name": "Tag"
             }
         },
-        "ApiResponse": {
+        "GetUserResponse": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "type": {
+                "res": {
                     "type": "string"
                 },
+                "user": {
+                    "$ref": "#/definitions/User"
+                }
+            }
+        },
+        "GetUsersResponse": {
+            "type": "object",
+            "properties": {
+                "res": {
+                    "type": "string"
+                },
+                "users": {
+                    "$ref": "#/definitions/Users"
+                }
+            }
+        },
+        "LoginResponse": {
+            "type": "object",
+            "properties": {
                 "message": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }
